@@ -90,6 +90,7 @@ class Chatbot extends Component {
             };
 
             console.log(process.env.REACT_APP_DF_SESSION_ID)
+            // console.log(googlePrivateKey);
             const res = await axios.post(
                 'https://dialogflow.googleapis.com/v2/projects/' + process.env.REACT_APP_GOOGLE_PROJECT_ID +
                 '/agent/sessions/' + process.env.REACT_APP_DF_SESSION_ID + cookies.get('userID') + ':detectIntent',
