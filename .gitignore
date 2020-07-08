@@ -1,5 +1,6 @@
 node_modules
 .idea
+.vscodepackage-lock.json
 package-lock.json
 config/dev.js
 .vscode
