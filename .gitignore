@@ -3,4 +3,5 @@ node_modules
 .vscodepackage-lock.json
 package-lock.json
 config/dev.js
+config
 .vscode
