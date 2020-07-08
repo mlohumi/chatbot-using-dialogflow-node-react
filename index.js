@@ -11,6 +11,14 @@ require('./models/Registration');
 require('./models/Demand');
 require('./models/Coupons');
 
+// var express = require('express'),
+//     cors = require('cors')
+// app = express();
+
+// const corsOptions = {
+//     origin: true,
+//     credentials: true
+// }
 
 app.use(bodyParser.json());
 
@@ -28,6 +36,6 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-
+// app.options('*', cors(corsOptions));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);

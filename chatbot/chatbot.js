@@ -3,6 +3,7 @@ const dialogflow = require('dialogflow');
 const structjson = require('./structjson.js');
 const config = require('../config/keys');
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 const googleAuth = require('google-oauth-jwt');
 
@@ -13,10 +14,10 @@ const languageCode = config.dialogFlowSessionLanguageCode;
 const credentials = {
     client_email: config.googleClientEmail,
     private_key:
-    config.googlePrivateKey,
+        config.googlePrivateKey,
 };
 
-const sessionClient = new dialogflow.SessionsClient({projectId, credentials});
+const sessionClient = new dialogflow.SessionsClient({ projectId, credentials });
 
 
 
@@ -25,7 +26,7 @@ const Registration = mongoose.model('registration');
 
 module.exports = {
 
-    getToken: async function() {
+    getToken: async function () {
         return new Promise((resolve) => {
             googleAuth.authenticate(
                 {
@@ -40,7 +41,46 @@ module.exports = {
         });
     },
 
-    textQuery: async function(text, userID, parameters = {}) {
+    analytics: async function (userId, user_msg, agent_msg, intent, not_handled) {
+        var data1 = JSON.stringify({
+            "messages":
+                [{
+                    "api_key": "c83c75d4-7ce5-4a0a-be3e-a1d803b8d01c",
+                    "type": "user",
+                    "user_id": userId,
+                    "time_stamp": Date.now().toString(),
+                    "platform": "dezinee",
+                    "message": user_msg,
+                    "intent": intent,
+                    "not_handled": not_handled
+                },
+                {
+                    "api_key": "c83c75d4-7ce5-4a0a-be3e-a1d803b8d01c",
+                    "type": "agent",
+                    "user_id": userId,
+                    "time_stamp": Date.now().toString(),
+                    "platform": "dezinee",
+                    "message": agent_msg
+                }]
+
+        });
+        let config1 = {
+            method: 'post',
+            url: 'https://chatbase-area120.appspot.com/api/messages',
+            headers: {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+            },
+            data: data1
+        };
+
+        const json = await axios(config1)
+        const responses = JSON.stringify(json.data)
+        return responses;
+
+    },
+
+    textQuery: async function (text, userID, parameters = {}) {
         let self = module.exports;
         const sessionPath = sessionClient.sessionPath(projectId, sessionId + userID);
 
@@ -67,7 +107,7 @@ module.exports = {
 
     },
 
-    eventQuery: async function(event, userID,  parameters = {}) {
+    eventQuery: async function (event, userID, parameters = {}) {
         let self = module.exports;
         let sessionPath = sessionClient.sessionPath(projectId, sessionId + userID);
 
@@ -89,7 +129,7 @@ module.exports = {
     },
 
 
-    handleAction: function(responses){
+    handleAction: function (responses) {
         let self = module.exports;
         let queryResult = responses[0].queryResult;
 
@@ -104,7 +144,7 @@ module.exports = {
         return responses;
     },
 
-    saveRegistration: async function(fields){
+    saveRegistration: async function (fields) {
         const registration = new Registration({
             name: fields.name.stringValue,
             address: fields.address.stringValue,
@@ -112,10 +152,10 @@ module.exports = {
             email: fields.email.stringValue,
             dateSent: Date.now()
         });
-        try{
+        try {
             let reg = await registration.save();
             console.log(reg);
-        } catch (err){
+        } catch (err) {
             console.log(err);
         }
     }
