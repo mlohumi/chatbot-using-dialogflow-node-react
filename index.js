@@ -11,14 +11,14 @@ require('./models/Registration');
 require('./models/Demand');
 require('./models/Coupons');
 
-var express = require('express'),
-    cors = require('cors')
-app = express();
+// var express = require('express'),
+//     cors = require('cors')
+// app = express();
 
-const corsOptions = {
-    origin: true,
-    credentials: true
-}
+// const corsOptions = {
+//     origin: true,
+//     credentials: true
+// }
 
 app.use(bodyParser.json());
 
