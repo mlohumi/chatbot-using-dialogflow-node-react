@@ -9,12 +9,11 @@ import Message from "./Message";
 import Card from "./Card";
 import QuickReplies from "./QuickReplies";
 
-import "./global.css"
-import avatar from "./bot.jpg"
+import "./global.css";
+import avatar from "./bot.jpg";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 const cookies = new Cookies();
 
@@ -26,8 +25,8 @@ class Chatbot extends Component {
     super(props);
     // This binding is necessary to make `this` work in the callback
     this._handleInputKeyPress = this._handleInputKeyPress.bind(this);
-    this._handleChange = this._handleChange.bind(this)
-    this._handleClick = this._handleClick.bind(this)
+    this._handleChange = this._handleChange.bind(this);
+    this._handleClick = this._handleClick.bind(this);
     this._handleQuickReplyPayload = this._handleQuickReplyPayload.bind(this);
 
     this.hide = this.hide.bind(this);
@@ -47,7 +46,14 @@ class Chatbot extends Component {
 
   /* Chatbase Analytics API call */
   async cb_analytics(userId, user_msg, agent_msg, intent, not_handled) {
-    await axios.post('/api/analytics', { userId, user_msg, agent_msg, intent, not_handled })
+    let ss = await axios.post("/api/analytics", {
+      userId,
+      user_msg,
+      agent_msg,
+      intent,
+      not_handled,
+    });
+    console.log(ss);
   }
   /*End*/
 
@@ -100,17 +106,17 @@ class Chatbot extends Component {
       };
       const res = await axios.post(
         "https://dialogflow.googleapis.com/v2/projects/" +
-        process.env.REACT_APP_GOOGLE_PROJECT_ID +
-        "/agent/sessions/" +
-        process.env.REACT_APP_DF_SESSION_ID +
-        cookies.get("userID") +
-        ":detectIntent",
+          process.env.REACT_APP_GOOGLE_PROJECT_ID +
+          "/agent/sessions/" +
+          process.env.REACT_APP_DF_SESSION_ID +
+          cookies.get("userID") +
+          ":detectIntent",
         request,
         config
       );
       let says = {};
       // console.log(cookies.get("userID"))
-      // console.log(res)
+      console.log(res);
 
       if (res.data.queryResult.fulfillmentMessages) {
         for (let msg of res.data.queryResult.fulfillmentMessages) {
@@ -123,28 +129,28 @@ class Chatbot extends Component {
 
         /*Chatbase Analytics variables - START*/
 
-        let userId = (cookies.get("userID")).toString()
-        let user_msg = res.data.queryResult.queryText
-        let agent_msg = res.data.queryResult.fulfillmentText
-        let intent
-        let not_handled
-        if ((Object.keys(res.data.queryResult.intent).length === 0)) {
-          intent = "smalltalk"
-          not_handled = false
-        }
-        else if ((res.data.queryResult.intent.isFallback) && (res.data.queryResult.intent.isFallback === true)) {
-          intent = "Fallback Intent"
-          not_handled = true
-        }
-        else {
-          intent = res.data.queryResult.intent.displayName
-          not_handled = false
+        let userId = cookies.get("userID").toString();
+        let user_msg = res.data.queryResult.queryText;
+        let agent_msg = res.data.queryResult.fulfillmentText;
+        let intent;
+        let not_handled;
+        if (Object.keys(res.data.queryResult.intent).length === 0) {
+          intent = "smalltalk";
+          not_handled = false;
+        } else if (
+          res.data.queryResult.intent.isFallback &&
+          res.data.queryResult.intent.isFallback === true
+        ) {
+          intent = "Fallback Intent";
+          not_handled = true;
+        } else {
+          intent = res.data.queryResult.intent.displayName;
+          not_handled = false;
         }
 
         this.cb_analytics(userId, user_msg, agent_msg, intent, not_handled);
 
         /* END */
-
       }
     } catch (e) {
       console.log(e);
@@ -177,7 +183,6 @@ class Chatbot extends Component {
       }, x * 1000);
     });
   }
-
 
   async componentDidMount() {
     this.df_event_query("Welcome");
@@ -308,17 +313,17 @@ class Chatbot extends Component {
     if (e.key === "Enter") {
       this.df_text_query(e.target.value);
       // e.target.value = "";
-      this.setState({ input: '' })
+      this.setState({ input: "" });
     }
   }
 
   _handleChange(e) {
-    this.setState({ input: e.target.value })
+    this.setState({ input: e.target.value });
   }
 
   _handleClick(e) {
     this.df_text_query(this.state.input);
-    this.setState({ input: '' })
+    this.setState({ input: "" });
   }
   render() {
     // if (this.state.showBot) {
@@ -340,7 +345,7 @@ class Chatbot extends Component {
             ref={(el) => {
               this.messagesEnd = el;
             }}
-          // style={{ float: "left", clear: "both" }}
+            // style={{ float: "left", clear: "both" }}
           ></div>
         </div>
         {/* <div className="input-group mb-3">
@@ -353,14 +358,23 @@ class Chatbot extends Component {
           </input>
         </div> */}
         <div className="input-group mb-3">
-          <input type="text" value={this.state.input} onChange={this._handleChange} className="form-control msg-input" placeholder="Write a message..."
+          <input
+            type="text"
+            value={this.state.input}
+            onChange={this._handleChange}
+            className="form-control msg-input"
+            placeholder="Write a message..."
             ref={(input) => {
               this.talkInput = input;
             }}
             onKeyPress={this._handleInputKeyPress}
-            id="user_says">
-          </input>
-          <FontAwesomeIcon icon={faPaperPlane} className="icon-inp" onClick={this._handleClick} />
+            id="user_says"
+          ></input>
+          <FontAwesomeIcon
+            icon={faPaperPlane}
+            className="icon-inp"
+            onClick={this._handleClick}
+          />
           {/* <div class="input-group-append"> */}
           {/* <button class="btn btn-outline-secondary" onClick={this._handleClick} type="button">Button</button> */}
           {/* </div> */}
