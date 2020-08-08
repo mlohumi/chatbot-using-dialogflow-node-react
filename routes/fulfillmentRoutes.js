@@ -4,12 +4,12 @@ const mongoose = require("mongoose");
 const Demand = mongoose.model("demand");
 const Coupon = mongoose.model("coupon");
 const Registration = mongoose.model("registration");
+const Lead = mongoose.model("lead");
 
 module.exports = (app) => {
   app.post("/", async (req, res) => {
-    console.log("Mukesh");
     const agent = new WebhookClient({ request: req, response: res });
-    console.log(agent);
+    // console.log(agent);
 
     function snoopy(agent) {
       agent.add(`Welcome to my Snoopy fulfillment!`);
@@ -26,6 +26,20 @@ module.exports = (app) => {
       try {
         let reg = await registration.save();
         console.log(reg);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function lead(fields) {
+      const lead = new Lead({
+        name: agent.parameters.name,
+        email: agent.parameters.email,
+        phone: agent.parameters.phone,
+      });
+      try {
+        let lcap = await lead.save();
+        console.log(lcap);
       } catch (err) {
         console.log(err);
       }
@@ -65,6 +79,7 @@ module.exports = (app) => {
     intentMap.set("snoopy", snoopy);
     intentMap.set("learn courses", learn);
     intentMap.set("recommend - yes", registration);
+    intentMap.set("More Details Yes - Lead Capture", lead);
     intentMap.set("Default Fallback Intent", fallback);
 
     agent.handleRequest(intentMap);

@@ -19,6 +19,7 @@ const credentials = {
 const sessionClient = new dialogflow.SessionsClient({ projectId, credentials });
 
 const Registration = mongoose.model("registration");
+const Lead = mongoose.model("lead");
 
 module.exports = {
   getToken: async function () {
@@ -131,6 +132,13 @@ module.exports = {
           self.saveRegistration(queryResult.parameters.fields);
         }
         break;
+      case "leadcapture-yes":
+        console.log("1");
+        if (queryResult.allRequiredParamsPresent) {
+          console.log(queryResult.parameters.fields);
+          self.saveLead(queryResult.parameters.fields);
+        }
+        break;
     }
 
     return responses;
@@ -147,6 +155,20 @@ module.exports = {
     try {
       let reg = await registration.save();
       console.log(reg);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  saveLead: async function (fields) {
+    const lead = new Lead({
+      name: fields.name.stringValue,
+      email: fields.email.stringValue,
+      phone: fields.phone.stringValue,
+    });
+    try {
+      let lcap = await lead.save();
+      console.log(lcap);
     } catch (err) {
       console.log(err);
     }
