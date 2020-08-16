@@ -45,16 +45,16 @@ class Chatbot extends Component {
   }
 
   /* Chatbase Analytics API call */
-  async cb_analytics(userId, user_msg, agent_msg, intent, not_handled) {
-    let ss = await axios.post("/api/analytics", {
-      userId,
-      user_msg,
-      agent_msg,
-      intent,
-      not_handled,
-    });
-    console.log(ss);
-  }
+  // async cb_analytics(userId, user_msg, agent_msg, intent, not_handled) {
+  //   let ss = await axios.post("/api/analytics", {
+  //     userId,
+  //     user_msg,
+  //     agent_msg,
+  //     intent,
+  //     not_handled,
+  //   });
+  //   console.log(ss);
+  // }
   /*End*/
 
   async df_text_query(text) {
@@ -115,8 +115,6 @@ class Chatbot extends Component {
         config
       );
       let says = {};
-      // console.log(cookies.get("userID"))
-      console.log(res);
 
       if (res.data.queryResult.fulfillmentMessages) {
         for (let msg of res.data.queryResult.fulfillmentMessages) {
@@ -129,26 +127,26 @@ class Chatbot extends Component {
 
         /*Chatbase Analytics variables - START*/
 
-        let userId = cookies.get("userID").toString();
-        let user_msg = res.data.queryResult.queryText;
-        let agent_msg = res.data.queryResult.fulfillmentText;
-        let intent;
-        let not_handled;
-        if (Object.keys(res.data.queryResult.intent).length === 0) {
-          intent = "smalltalk";
-          not_handled = false;
-        } else if (
-          res.data.queryResult.intent.isFallback &&
-          res.data.queryResult.intent.isFallback === true
-        ) {
-          intent = "Fallback Intent";
-          not_handled = true;
-        } else {
-          intent = res.data.queryResult.intent.displayName;
-          not_handled = false;
-        }
+        // let userId = cookies.get("userID").toString();
+        // let user_msg = res.data.queryResult.queryText;
+        // let agent_msg = res.data.queryResult.fulfillmentText;
+        // let intent;
+        // let not_handled;
+        // if (Object.keys(res.data.queryResult.intent).length === 0) {
+        //   intent = "smalltalk";
+        //   not_handled = false;
+        // } else if (
+        //   res.data.queryResult.intent.isFallback &&
+        //   res.data.queryResult.intent.isFallback === true
+        // ) {
+        //   intent = "Fallback Intent";
+        //   not_handled = true;
+        // } else {
+        //   intent = res.data.queryResult.intent.displayName;
+        //   not_handled = false;
+        // }
 
-        this.cb_analytics(userId, user_msg, agent_msg, intent, not_handled);
+        // this.cb_analytics(userId, user_msg, agent_msg, intent, not_handled);
 
         /* END */
       }
@@ -254,8 +252,6 @@ class Chatbot extends Component {
       message.msg.payload &&
       message.msg.payload.cards
     ) {
-      //message.msg.payload.fields.cards.listValue.values
-
       return (
         <div key={i}>
           <div
@@ -320,7 +316,6 @@ class Chatbot extends Component {
     this.setState({ input: "" });
   }
   render() {
-    // if (this.state.showBot) {
     return (
       <div className="bot-outline">
         <nav className="navbar navbar-light bg-light top-nav">
@@ -333,24 +328,13 @@ class Chatbot extends Component {
           </div>
         </nav>
         <div className="bot-check">
-          {/* <div className = "chat-page"> */}
           {this.renderMessages(this.state.messages)}
           <div
             ref={(el) => {
               this.messagesEnd = el;
             }}
-            // style={{ float: "left", clear: "both" }}
           ></div>
         </div>
-        {/* <div className="input-group mb-3">
-          <input type="text" className="form-control msg-input" placeholder="Write a message..."
-            ref={(input) => {
-              this.talkInput = input;
-            }}
-            onKeyPress={this._handleInputKeyPress}
-            id="user_says">
-          </input>
-        </div> */}
         <div className="input-group mb-3">
           <input
             type="text"
@@ -369,48 +353,9 @@ class Chatbot extends Component {
             className="icon-inp"
             onClick={this._handleClick}
           />
-          {/* <div class="input-group-append"> */}
-          {/* <button class="btn btn-outline-secondary" onClick={this._handleClick} type="button">Button</button> */}
-          {/* </div> */}
         </div>
       </div>
     );
-    // } else {
-    //   return (
-    //     <div
-    //       style={{
-    //         minHeight: 40,
-    //         maxHeight: 500,
-    //         width: 400,
-    //         position: "center",
-    //         bottom: 0,
-    //         right: 0,
-    //         border: "1px solid lightgray",
-    //       }}
-    //     >
-    //       <nav>
-    //         <div className="nav-wrapper">
-    //           <a href="/" className="brand-logo">
-    //             ChatBot
-    //           </a>
-    //           <ul id="nav-mobile" className="right hide-on-med-and-down">
-    //             <li>
-    //               <a href="/" onClick={this.show}>
-    //                 Show
-    //               </a>
-    //             </li>
-    //           </ul>
-    //         </div>
-    //       </nav>
-    //       <div
-    //         ref={(el) => {
-    //           this.messagesEnd = el;
-    //         }}
-    //         style={{ float: "left", clear: "both" }}
-    //       ></div>
-    //     </div>
-    //   );
-    // }
   }
 }
 

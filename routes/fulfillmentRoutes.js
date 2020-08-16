@@ -1,73 +1,89 @@
-const { WebhookClient } = require("dialogflow-fulfillment");
+const { WebhookClient, Payload } = require("dialogflow-fulfillment");
 
 const mongoose = require("mongoose");
-const Demand = mongoose.model("demand");
-const Coupon = mongoose.model("coupon");
-const Registration = mongoose.model("registration");
-const Lead = mongoose.model("lead");
+const Order = mongoose.model("order");
 
 module.exports = (app) => {
   app.post("/", async (req, res) => {
     const agent = new WebhookClient({ request: req, response: res });
-    // console.log(agent);
 
-    function snoopy(agent) {
-      agent.add(`Welcome to my Snoopy fulfillment!`);
-    }
-
-    async function registration(agent) {
-      const registration = new Registration({
-        name: agent.parameters.name,
-        address: agent.parameters.address,
-        phone: agent.parameters.phone,
-        email: agent.parameters.email,
-        dateSent: Date.now(),
+    async function final(agent) {
+      const orderid = Math.floor(100000 + Math.random() * 900000).toString();
+      const name = agent.parameters.name[0];
+      const size = agent.parameters.size;
+      const toppings = agent.parameters.toppings;
+      const order = new Order({
+        toppings: toppings,
+        pizza: agent.parameters.pizza,
+        name: name,
+        phone: agent.parameters.phone[0],
+        size: size,
+        address: agent.parameters.Address[0],
+        orderid: orderid,
       });
+      const msg =
+        "Awesome " +
+        name +
+        " your order " +
+        size +
+        " " +
+        toppings +
+        " " +
+        "pizza has been placed. OrderId is " +
+        orderid +
+        ".";
+      var payload = {
+        quick_replies: [
+          {
+            text: "Track Order",
+            payload: "track order",
+          },
+        ],
+        text: msg,
+      };
       try {
-        let reg = await registration.save();
-        console.log(reg);
+        let ord = await order.save();
+        await agent.add(
+          new Payload(agent.UNSPECIFIED, payload, {
+            rawPayload: true,
+            sendAsMessage: true,
+          })
+        );
+
+        console.log(ord);
       } catch (err) {
         console.log(err);
       }
     }
 
-    async function lead(fields) {
-      const lead = new Lead({
-        name: agent.parameters.name,
-        email: agent.parameters.email,
-        phone: agent.parameters.phone,
-      });
+    async function track(agent) {
+      let ord = agent.parameters.order;
+      const payload = {
+        quick_replies: [
+          {
+            text: "Track Order",
+            payload: "track order",
+          },
+        ],
+        text: "No order found with this order id. Please try again",
+      };
+      let orderf = await Order.findOne({ orderid: ord });
       try {
-        let lcap = await lead.save();
-        console.log(lcap);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    async function learn(agent) {
-      Demand.findOne({ course: agent.parameters.courses }, function (
-        err,
-        course
-      ) {
-        if (course !== null) {
-          course.counter++;
-          course.save();
+        if (orderf !== null) {
+          agent.add(
+            "Your order is out for delivery. One of our delivery boy will contact you soon"
+          );
         } else {
-          const demand = new Demand({ course: agent.parameters.courses });
-          demand.save();
+          await agent.add(
+            new Payload(agent.UNSPECIFIED, payload, {
+              rawPayload: true,
+              sendAsMessage: true,
+            })
+          );
         }
-      });
-      let responseText = `You want to learn about ${agent.parameters.courses}. 
-                    Here is a link to all of my courses: https://www.udemy.com/user/jana-bergant`;
-
-      let coupon = await Coupon.findOne({ course: agent.parameters.courses });
-      if (coupon !== null) {
-        responseText = `You want to learn about ${agent.parameters.courses}. 
-                Here is a link to the course: ${coupon.link}`;
+      } catch (err) {
+        console.log(err);
       }
-
-      agent.add(responseText);
     }
 
     function fallback(agent) {
@@ -76,10 +92,9 @@ module.exports = (app) => {
     }
 
     let intentMap = new Map();
-    intentMap.set("snoopy", snoopy);
-    intentMap.set("learn courses", learn);
-    intentMap.set("recommend - yes", registration);
-    intentMap.set("More Details Yes - Lead Capture", lead);
+    intentMap.set("final", final);
+    intentMap.set("track order", track);
+    intentMap.set("order pizza", final);
     intentMap.set("Default Fallback Intent", fallback);
 
     agent.handleRequest(intentMap);

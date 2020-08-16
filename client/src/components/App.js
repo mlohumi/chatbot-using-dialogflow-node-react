@@ -9,16 +9,16 @@ import Chatbot from "./chatbot/Chatbot";
 // import Chatbot1 from './chatbot/Chatbot1';
 
 const App = () => (
-  //   <div className="container">
-  <BrowserRouter>
-    {/* <Header /> */}
-    <Route exact path="/" component={Landing} />
-    <Route exact path="/about" component={About} />
-    <Route exact path="/shop" component={Shop} />
-    <Route exact path="/header" component={Header} />
-    <Route exact path="/chat" component={Chatbot} />
-  </BrowserRouter>
-  //   </div>
+  <div className="container" style={{ maxWidth: 450, marginTop: 10 }}>
+    <BrowserRouter>
+      {/* <Header /> */}
+      <Route exact path="/" component={Landing} />
+      <Route exact path="/about" component={About} />
+      <Route exact path="/shop" component={Shop} />
+      <Route exact path="/header" component={Header} />
+      <Route exact path="/chat" component={Chatbot} />
+    </BrowserRouter>
+  </div>
 );
 
 export default App;

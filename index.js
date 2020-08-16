@@ -10,19 +10,7 @@ mongoose.connect(config.mongoURI, {
   useUnifiedTopology: true,
 });
 
-require("./models/Registration");
-require("./models/Demand");
-require("./models/Coupons");
-require("./models/Lead");
-
-// var express = require('express'),
-//     cors = require('cors')
-// app = express();
-
-// const corsOptions = {
-//     origin: true,
-//     credentials: true
-// }
+require("./models/Order");
 
 app.use(bodyParser.json());
 

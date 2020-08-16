@@ -25,17 +25,17 @@ module.exports = (app) => {
     res.send(responses[0].queryResult);
   });
 
-  app.post("/api/analytics", async (req, res) => {
-    let responses = await chatbot.analytics(
-      req.body.userId,
-      req.body.user_msg,
-      req.body.agent_msg,
-      req.body.intent,
-      req.body.not_handled
-    );
-    res.send(responses);
-    // console.log(responses);
-  });
+  // app.post("/api/analytics", async (req, res) => {
+  //   let responses = await chatbot.analytics(
+  //     req.body.userId,
+  //     req.body.user_msg,
+  //     req.body.agent_msg,
+  //     req.body.intent,
+  //     req.body.not_handled
+  //   );
+  //   res.send(responses);
+  //   // console.log(responses);
+  // });
 
   app.get("/api/get_client_token", async (req, res) => {
     let token = await chatbot.getToken();
